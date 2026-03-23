@@ -1,0 +1,31 @@
+{
+  "name": "Ubuntu25.04 with GCC15",
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspaces/workshop_9",
+  "remoteUser": "dev",
+  "postStartCommand": "(conan profile detect || true) && mkdir -p build-debug build-release && cd build-debug && conan build -b missing -s build_type=Debug .. && cd ../build-release && conan build -b missing -s build_type=Release .. && echo '=== Running Tests ===' && cd ../build-debug && ctest --debug && cd ../build-release && ctest --debug",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "vadimcn.vscode-lldb",
+        "twxs.cmake",
+        "streetsidesoftware.code-spell-checker-russian",
+        "streetsidesoftware.code-spell-checker",
+        "matepek.vscode-catch2-test-adapter"
+      ]
+    }
+  },
+  "forwardPorts": [8080, 8081],
+  "portsAttributes": {
+    "8080": {
+      "label": "Simulator Server-A",
+      "onAutoForward": "silent"
+    },
+    "8081": {
+      "label": "Simulator Server-B",
+      "onAutoForward": "silent"
+    }
+  }
+}

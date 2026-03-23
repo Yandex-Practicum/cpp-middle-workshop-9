@@ -1,0 +1,10 @@
+# Ignore GCC-specific flags that clang doesn't recognize
+CompileFlags:
+  Remove: [-fconcepts-diagnostics-depth=*]
+  CompilationDatabase: build-release
+
+# Optional: Add additional clangd-specific flags
+  Add: [-std=c++23]
+
+Diagnostics:
+  UnusedIncludes: Strict

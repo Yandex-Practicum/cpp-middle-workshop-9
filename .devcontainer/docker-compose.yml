@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  simulator:
+    build:
+      dockerfile: .devcontainer/Dockerfile.simulator
+      context: ..
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    networks:
+      - workshop-network
+    restart: unless-stopped
+
+  dev:
+    build:
+      dockerfile: .devcontainer/Dockerfile.dev
+      context: ..
+      args:
+        USER_UID: "1000"
+        USER_GID: "1001"
+    volumes:
+      - ..:/workspaces/workshop_9
+      - ~/.gitconfig:/home/dev/.gitconfig:cached
+      - ~/.conan2:/home/dev/.conan2:cached
+    working_dir: /workspaces/workshop_9
+    command: ["tail", "-f", "/dev/null"]
+    networks:
+      - workshop-network
+    restart: unless-stopped
+
+networks:
+  workshop-network:
+    driver: bridge

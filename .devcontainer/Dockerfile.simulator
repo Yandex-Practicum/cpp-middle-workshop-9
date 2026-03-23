@@ -1,0 +1,27 @@
+FROM ubuntu@sha256:79efa276fdefa2ee3911db29b0608f8c0561c347ec3f4d4139980d43b168d991
+
+# Update the package database
+RUN apt clean
+RUN apt update
+
+# Install Python and websockets for simulator
+RUN apt install -y python3-minimal python3-pip
+
+# Cleanup
+RUN apt autoremove -y \
+    && apt autoclean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/* \
+    && rm -rf /tmp/*
+
+# Install websockets library for the simulator
+RUN pip3 install websockets --break-system-packages
+
+# Copy the simulator script
+COPY crypto-simulator/simulator.py /simulator.py
+
+# Expose ports
+EXPOSE 8080 8081
+
+# Run simulator
+CMD ["python3", "/simulator.py"]
