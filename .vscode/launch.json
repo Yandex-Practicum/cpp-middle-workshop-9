@@ -1,0 +1,30 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Launch Debug Crypto Terminal",
+            "program": "${workspaceFolder}/build-debug/crypto_terminal",
+            "args": [
+            ],
+            "cwd": "${workspaceFolder}/build-debug",
+            "preLaunchTask": "GCC: Build Debug",
+            "initCommands": ["settings set target.disable-aslr false"]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Launch Release Crypto Terminal",
+            "program": "${workspaceFolder}/build-release/crypto_terminal",
+            "args": [
+            ],
+            "cwd": "${workspaceFolder}/build-release",
+            "preLaunchTask": "GCC: Build Release",
+            "initCommands": ["settings set target.disable-aslr false"]
+        }
+    ]
+}

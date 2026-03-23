@@ -1,0 +1,48 @@
+{
+    // ========================================================================
+    // Editor settings
+    // ========================================================================
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+
+    // ========================================================================
+    // C++ formatting via clangd
+    // ========================================================================
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveTimeout": 3000,
+
+    // ========================================================================
+    // Clangd настройки
+    // ========================================================================
+    "clangd.path": "/usr/bin/clangd-20",
+    "clangd.arguments": [
+        "--clang-tidy",
+        "--completion-style=detailed",
+        "--pch-storage=memory",
+        "--background-index",
+        "--all-scopes-completion",
+        "--function-arg-placeholders",
+        "--header-insertion-decorators"
+    ],
+
+    // ========================================================================
+    // C/C++ IntelliSense (отключаем в пользу clangd)
+    // ========================================================================
+    "C_Cpp.default.cpp_standard": "c++23",
+    "C_Cpp.errorSquiggles": "disabled",
+    "C_Cpp.intelliSenseEngine": "disabled",
+
+    // ========================================================================
+    // CMake настройки
+    // ========================================================================
+    "cmake.configureOnOpen": false,
+    "cmake.buildDirectory": "${workspaceFolder}/build-release",
+
+    // ========================================================================
+    // Отладка
+    // ========================================================================
+    //"lldb.library": "/usr/lib/x86_64-linux-gnu/liblldb.so",
+    "lldb.launch.expressions": "native"
+}
