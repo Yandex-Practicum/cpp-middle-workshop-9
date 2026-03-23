@@ -99,4 +99,4 @@ inline auto parse_serv_a_orderbook_sender(beast::flat_buffer buffer) -> ex::send
 [[nodiscard]]
 inline auto parse_serv_b_orderbook_sender(beast::flat_buffer buffer) -> ex::sender auto;
 
-} // namespace crypto::parser
+} // namespace parser

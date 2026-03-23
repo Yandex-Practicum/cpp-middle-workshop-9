@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(CryptoTerminal VERSION 0.1.0 LANGUAGES CXX)
+project(Terminal VERSION 0.1.0 LANGUAGES CXX)
 
 # ============================================================================
 # CMake Policies
@@ -78,15 +78,15 @@ list(FILTER SRC_FILES EXCLUDE REGEX ".*/main\\.cpp$")
 # Основная библиотека проекта (business logic)
 # ============================================================================
 # Используем INTERFACE библиотеку т.к. реализация в заголовках (header-only)
-add_library(crypto_core INTERFACE)
+add_library(core INTERFACE)
 
-target_include_directories(crypto_core
+target_include_directories(core
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(crypto_core
+target_link_libraries(core
     INTERFACE
         boost::boost            # Boost.Asio + Boost.Beast (header-only)
         nlohmann_json::nlohmann_json
@@ -94,31 +94,20 @@ target_link_libraries(crypto_core
         openssl::openssl            # SSL/TLS для WSS
 )
 
-target_compile_features(crypto_core INTERFACE cxx_std_23)
+target_compile_features(core INTERFACE cxx_std_23)
 
 # ============================================================================
 # Исполняемый файл (main + UI)
 # ============================================================================
-add_executable(crypto_terminal ${CMAKE_SOURCE_DIR}/src/main.cpp)
+add_executable(terminal ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
-target_link_libraries(crypto_terminal
+target_link_libraries(terminal
     PRIVATE
-        crypto_core
+        core
         ftxui::screen
         ftxui::dom
         ftxui::component
 )
-
-# ============================================================================
-# Пример использования WebSocket sender
-# ============================================================================
-add_executable(websocket_example ${CMAKE_SOURCE_DIR}/src/websocket_example.cpp)
-
-target_link_libraries(websocket_example
-    PRIVATE
-        crypto_core
-)
-
 # ============================================================================
 # Тесты
 # ============================================================================
@@ -128,22 +117,22 @@ if(WITH_TESTS)
     file(GLOB_RECURSE TEST_SRC_FILES "${CMAKE_SOURCE_DIR}/tests/*.cpp")
 
     if(TEST_SRC_FILES)
-        add_executable(crypto_terminal_tests ${TEST_SRC_FILES})
+        add_executable(terminal_tests ${TEST_SRC_FILES})
 
-        target_link_libraries(crypto_terminal_tests
+        target_link_libraries(terminal_tests
             PUBLIC
-                crypto_core
+                core
             PRIVATE
                 GTest::GTest
                 GTest::Main
         )
 
-        add_test(NAME crypto_terminal_tests COMMAND crypto_terminal_tests)
+        add_test(NAME terminal_tests COMMAND terminal_tests)
 
         # Для тестов тоже включаем санитайзеры если нужно
         if(WITH_SANITIZERS)
-            target_compile_options(crypto_terminal_tests PRIVATE -fsanitize=address,undefined)
-            target_link_options(crypto_terminal_tests PRIVATE -fsanitize=address,undefined)
+            target_compile_options(terminal_tests PRIVATE -fsanitize=address,undefined)
+            target_link_options(terminal_tests PRIVATE -fsanitize=address,undefined)
         endif()
     endif()
 endif()
@@ -152,7 +141,7 @@ endif()
 # Вывод информации о сборке
 # ============================================================================
 message(STATUS "")
-message(STATUS "📦 Crypto Terminal Configuration:")
+message(STATUS "📦 Terminal Configuration:")
 message(STATUS "   C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "   Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "   Tests: ${WITH_TESTS}")

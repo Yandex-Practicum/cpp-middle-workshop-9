@@ -98,7 +98,7 @@ inline void render_frame(
     Color arb_status_color = has_arb ? Color::Green : Color::GrayDark;
 
     auto header = hbox({
-        text(" 🚀 Crypto Spread Terminal - BTCUSDT ") | bgcolor(Color::DarkBlue) | bold,
+        text(" 🚀 Spread Terminal") | bgcolor(Color::DarkBlue) | bold,
         text(arb_status) | bgcolor(arb_status_color) | color(Color::White) | bold,
         filler(),
     });

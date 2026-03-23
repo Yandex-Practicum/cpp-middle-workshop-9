@@ -4,11 +4,11 @@ from conan.tools.files import copy, rmdir
 from conan.tools.layout import basic_layout
 import os
 
-class CryptoTerminalConan(ConanFile):
-    name = "crypto_terminal"
+class TerminalConan(ConanFile):
+    name = "terminal"
     version = "0.1.0"
     settings = "os", "compiler", "build_type", "arch"
-    
+
     # Опции для гибкой настройки сборки
     options = {
         "with_tests": [True, False],

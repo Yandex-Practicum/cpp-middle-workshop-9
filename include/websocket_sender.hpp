@@ -63,7 +63,7 @@ inline auto connect_sender(ExchangeConfig config, std::reference_wrapper<net::io
 
             // Устанавливаем опции WebSocket
             ws->set_option(websocket::stream_base::decorator(
-                [](websocket::request_type &req) { req.set(beast::http::field::user_agent, "CryptoTerminal/1.0"); }));
+                [](websocket::request_type &req) { req.set(beast::http::field::user_agent, "Terminal/1.0"); }));
 
             // Проверяем stop_token
             auto stop_token = ex::get_stop_token(ctx);
@@ -118,4 +118,4 @@ inline auto close_sender(std::shared_ptr<websocket::stream<net::ip::tcp::socket>
         });
 }
 
-}  // namespace crypto::ws
+}  // namespace ws

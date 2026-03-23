@@ -36,4 +36,4 @@ inline auto make_orderbook_subscribe_message(
     return std::format(R"({{"op": "subscribe", "args": ["orderbook.{}"]}})", symbol);
 }
 
-} // namespace crypto::exchange
+} // namespace exchange

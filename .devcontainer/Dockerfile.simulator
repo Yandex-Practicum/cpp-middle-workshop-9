@@ -18,7 +18,7 @@ RUN apt autoremove -y \
 RUN pip3 install websockets --break-system-packages
 
 # Copy the simulator script
-COPY crypto-simulator/simulator.py /simulator.py
+COPY simulator/simulator.py /simulator.py
 
 # Expose ports
 EXPOSE 8080 8081

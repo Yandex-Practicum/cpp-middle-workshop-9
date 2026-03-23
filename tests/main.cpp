@@ -70,7 +70,7 @@ TEST(WebSocketConnectionTest, ConnectToTwoServersAndParseMessage) {
 
         // WebSocket handshake
         ws_a->set_option(websocket::stream_base::decorator(
-            [](websocket::request_type &req) { req.set(beast::http::field::user_agent, "CryptoTerminal/1.0"); }));
+            [](websocket::request_type &req) { req.set(beast::http::field::user_agent, "Terminal/1.0"); }));
         ws_a->handshake(exchange::kServerAConfig.host, exchange::kServerAConfig.path);
 
         EXPECT_TRUE(ws_a->is_open()) << "ServerA connection failed";
@@ -85,7 +85,7 @@ TEST(WebSocketConnectionTest, ConnectToTwoServersAndParseMessage) {
 
         // WebSocket handshake
         ws_b->set_option(websocket::stream_base::decorator(
-            [](websocket::request_type &req) { req.set(beast::http::field::user_agent, "CryptoTerminal/1.0"); }));
+            [](websocket::request_type &req) { req.set(beast::http::field::user_agent, "Terminal/1.0"); }));
         ws_b->handshake(exchange::kServerBConfig.host, exchange::kServerBConfig.path);
 
         EXPECT_TRUE(ws_b->is_open()) << "ServerB connection failed";

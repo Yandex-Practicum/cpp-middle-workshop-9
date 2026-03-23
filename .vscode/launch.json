@@ -7,8 +7,8 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Launch Debug Crypto Terminal",
-            "program": "${workspaceFolder}/build-debug/crypto_terminal",
+            "name": "Launch Debug Terminal",
+            "program": "${workspaceFolder}/build-debug/terminal",
             "args": [
             ],
             "cwd": "${workspaceFolder}/build-debug",
@@ -18,8 +18,8 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Launch Release Crypto Terminal",
-            "program": "${workspaceFolder}/build-release/crypto_terminal",
+            "name": "Launch Release Terminal",
+            "program": "${workspaceFolder}/build-release/terminal",
             "args": [
             ],
             "cwd": "${workspaceFolder}/build-release",
