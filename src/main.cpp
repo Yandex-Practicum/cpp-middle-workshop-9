@@ -16,18 +16,17 @@ int main() {
     exec::static_thread_pool pool{8};
     const auto &scheduler = pool.get_scheduler();
     std::println("Connecting to exchanges...");
-
-#warning "TODO: Параллельно подключаемся к обеим биржам"
-/*
-    Ваш код здесь: используйте connect_sender для подключения к обеим биржам и получения WebSocket stream'ов.
-     - Не забудьте обернуть ioc в std::reference_wrapper при передаче в sender
-     - Сохраните полученные WebSocket stream'ы для дальнейшего использования
-*/
+    auto [a_con, b_con] = ex::sync_wait(
+        ex::when_all(
+            ex::on(scheduler, ws::connect_sender(exch::kServerAConfig, std::ref(ioc))),
+            ex::on(scheduler, ws::connect_sender(exch::kServerBConfig, std::ref(ioc)))
+        )
+    ).value();
     std::println("🔌 Closing connections...");
-#warning "TODO: Graceful shutdown: параллельно закрываем соединения через close_sender"
-/*
-    Ваш код здесь: используйте close_sender для закрытия обоих WebSocket соединений.
-*/
+    ex::sync_wait(ex::when_all(
+        ex::on(scheduler, ws::close_sender(a_con)),
+        ex::on(scheduler, ws::close_sender(b_con))
+        ));
     pool.request_stop();
     std::println("🏁 All jobs completed");
     return 0;
