@@ -201,11 +201,21 @@ inline auto async_read_sender(websocket::stream<net::ip::tcp::socket> &ws) -> ex
  *   - set_stopped() — отмена
  * @note для конвертации beast::flat_buffer в string используйте beast::buffers_to_string(buffer.data())
  */
- #warning "TODO: Реализуйте print_message_sender, который принимает buffer и prefix, конвертирует buffer в string и печатает с префиксом. Не забудьте обработать исключения и stop_token."
 [[nodiscard]]
-inline auto print_message_sender(beast::flat_buffer buffer, std::string_view prefix) -> ex::sender auto ;
-/*
-    Ваш код здесь
-*/
+inline auto print_message_sender(beast::flat_buffer buffer, std::string_view prefix) -> ex::sender auto{
+    return exec::create<
+        ex::completion_signatures<ex::set_value_t(), ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>>(
+        [buf = std::move(buffer), prefix](auto ctx) noexcept {
+            try {
+                // Конвертируем buffer в string и печатаем
+                auto data = beast::buffers_to_string(buf.data());
+                std::println("[ThreadId: {}] {}{}", std::this_thread::get_id(), prefix, data);
+                // Успешная печать
+                ex::set_value(std::move(ctx.receiver));
+            } catch (...) {
+                ex::set_error(std::move(ctx.receiver), std::current_exception());
+            }
+        });
+}
 
 }  // namespace ws

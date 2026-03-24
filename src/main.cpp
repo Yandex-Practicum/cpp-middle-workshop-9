@@ -20,10 +20,9 @@ auto subscribe_and_print = [](auto& scheduler, auto& ws, std::string_view msg, s
             return ws::async_read_sender(ws);
         })
         // Печатаем подтверждение
-#warning "TODO: Воспользуйтесь ws::print_message_sender для печати полученного сообщения с префиксом."
-        /*
-            Ваш код здесь
-        */
+        | ex::let_value([prefix](beast::flat_buffer buffer) {
+            return ws::print_message_sender(std::move(buffer), prefix);
+        })
     );
 };
 
