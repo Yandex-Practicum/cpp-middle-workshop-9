@@ -88,25 +88,44 @@ inline OrderBook parse_serv_orderbook(std::string_view json_str, ExchangeId id){
     return book;
 }
 
-#warning "TODO: реализовать сендеры для парсинга сообщений от Server A и Server B, используя parse_serv_orderbook с соответствующим id"
 /**
  * @brief Sender для парсинга Server A order book из buffer
  * @note Для обработки сообщений от Server A (порт 8080) - используем parse_serv_orderbook с id = ServerA
  */
 [[nodiscard]]
-inline auto parse_serv_a_orderbook_sender(beast::flat_buffer buffer) -> orderbook_parser_sender auto;
-/*
-    Ваш код здесь
-*/
+inline auto parse_serv_a_orderbook_sender(beast::flat_buffer buffer) -> orderbook_parser_sender auto {
+    return exec::create<ex::completion_signatures<
+        ex::set_value_t(OrderBook),
+        ex::set_error_t(std::exception_ptr),
+        ex::set_stopped_t()>>([buf = std::move(buffer)](auto ctx) noexcept {
+
+        try {
+            auto book = parse_serv_orderbook(beast::buffers_to_string(buf.data()), ExchangeId::ServerA);
+            ex::set_value(std::move(ctx.receiver), std::move(book));
+        } catch (...) {
+            ex::set_error(std::move(ctx.receiver), std::current_exception());
+        }
+    });
+}
 
 /**
  * @brief Sender для парсинга Server B order book из buffer
  * @note Для обработки сообщений от Server B (порт 8081) - используем parse_serv_orderbook с id = ServerB
  */
 [[nodiscard]]
-inline auto parse_serv_b_orderbook_sender(beast::flat_buffer buffer) -> orderbook_parser_sender auto;
-/*
-    Ваш код здесь
-*/
+inline auto parse_serv_b_orderbook_sender(beast::flat_buffer buffer) -> orderbook_parser_sender auto{
+    return exec::create<ex::completion_signatures<
+        ex::set_value_t(OrderBook),
+        ex::set_error_t(std::exception_ptr),
+        ex::set_stopped_t()>>([buf = std::move(buffer)](auto ctx) noexcept {
+
+        try {
+            auto book = parse_serv_orderbook(beast::buffers_to_string(buf.data()), ExchangeId::ServerB);
+            ex::set_value(std::move(ctx.receiver), std::move(book));
+        } catch (...) {
+            ex::set_error(std::move(ctx.receiver), std::current_exception());
+        }
+    });
+}
 
 } // namespace parser

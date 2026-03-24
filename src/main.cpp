@@ -52,17 +52,23 @@ auto read_and_print = [](auto& scheduler, auto& ws, parser::orderbook_parser_fac
             | ex::let_value([&parser](beast::flat_buffer buffer) {
                 return std::forward<decltype(parser)>(parser)(std::move(buffer));
             })
-#warning "TODO: добавить запись данных в трекер внутри цепочки sender-ов, используя ex::let_value и g_spread_tracker.add_exchange_data()"
-#warning "TODO: добавить проверку g_stop_source.stop_requested() внутри ex::let_value и завершать цикл, при помощи return ex::just(true), при получении сигнала остановки. Для продолжения цикла использовать return ex::just(false)"
-#warning "TODO: добавить обработку ошибок чтения и парсинга при помощи ex::let_error"
-            /*
-                Ваш код здесь:
-                - внутри ex::let_value, после получения OrderBook, нужно вызвать g_spread_tracker.add_exchange_data(book) для обновления данных в трекере.
-                - также нужно проверить g_stop_source.stop_requested() и если он запрошен, то завершить цикл, вернув ex::just(true).
-                - если стоп не запрошен, то продолжить цикл, вернув ex::just(false).
-                - не забудьте обработать возможные ошибки чтения и парсинга, используя ex::let_error для логирования ошибок и продолжения работы.
-            */
+            | ex::let_value([](OrderBook book) {
+                g_spread_tracker.add_exchange_data(book.exchange_id, std::move(book));
+                // Проверяем сигнал остановки
+                if (g_stop_source.stop_requested()) {
+                    std::println("🛑 Signal received, stopping...");
+                    return ex::just(true);  // true = завершаем цикл
+                }
+                return ex::just(false);  // false = продолжаем цикл
+            })
         )
+        | ex::let_error([](std::exception_ptr eptr) {
+            try { std::rethrow_exception(eptr); }
+            catch (const std::exception& e) {
+                std::println("⚠️ Error: {}", e.what());
+            }
+            return ex::just();
+        })
     );
 };
 
