@@ -24,6 +24,7 @@
 #include <memory>
 #include <print>
 #include <string_view>
+#include <thread>
 
 namespace ws {
 
@@ -117,5 +118,94 @@ inline auto close_sender(std::shared_ptr<websocket::stream<net::ip::tcp::socket>
             }
         });
 }
+
+/**
+ * @brief Sender для отправки сообщения подписки (plain TCP)
+ *
+ * Completion signatures:
+ *   - set_value() — успешная отписка
+ *   - set_error(std::exception_ptr) — ошибка отправки
+ *   - set_stopped() — отмена
+ */
+[[nodiscard]]
+
+inline auto subscribe_sender(websocket::stream<net::ip::tcp::socket> &ws, std::string_view subscribe_message)
+    -> ex::sender auto {
+    return exec::create<
+        ex::completion_signatures<ex::set_value_t(), ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>>(
+        [&ws, subscribe_message](auto ctx) noexcept {
+            // Проверяем stop_token перед началом операции
+            if (ex::get_stop_token(ctx).stop_requested()) {
+                ex::set_stopped(std::move(ctx.receiver));
+                return;
+            }
+
+            try {
+                // Отправляем сообщение подписки
+                ws.write(net::buffer(subscribe_message));
+                // Успешная отправка
+                ex::set_value(std::move(ctx.receiver));
+            } catch (...) {
+                ex::set_error(std::move(ctx.receiver), std::current_exception());
+            }
+        });
+}
+
+/**
+ * @brief Sender для асинхронного чтения сообщения (plain TCP)
+ *
+ * Completion signatures:
+ *   - set_value(beast::flat_buffer) — успешное чтение
+ *   - set_error(std::exception_ptr) — ошибка чтения
+ *   - set_stopped() — отмена
+ */
+[[nodiscard]]
+inline auto async_read_sender(websocket::stream<net::ip::tcp::socket> &ws) -> ex::sender auto {
+    return exec::create<ex::completion_signatures<ex::set_value_t(beast::flat_buffer),
+                                                  ex::set_error_t(std::exception_ptr),
+                                                  ex::set_stopped_t()>>(
+        [&ws](auto ctx) noexcept {
+            // Проверяем stop_token перед началом операции
+            if (ex::get_stop_token(ctx).stop_requested()) {
+                ex::set_stopped(std::move(ctx.receiver));
+                return;
+            }
+            try {
+                // Буфер для чтения
+                auto buffer = beast::flat_buffer{};
+                // Читаем сообщение
+                ws.read(buffer);
+                // Успешное чтение
+                ex::set_value(std::move(ctx.receiver), std::move(buffer));
+
+            } catch (const beast::system_error &e) {
+                // Проверяем на закрытие соединения
+                if (e.code() == websocket::error::closed) {
+                    // WebSocket закрыт удалённой стороной — это не ошибка
+                    ex::set_stopped(std::move(ctx.receiver));
+                    return;
+                }
+                ex::set_error(std::move(ctx.receiver), std::current_exception());
+            } catch (...) {
+                ex::set_error(std::move(ctx.receiver), std::current_exception());
+            }
+        });
+}
+
+/**
+ * @brief Sender для печати полученного сообщения на экран
+ *
+ * Completion signatures:
+ *   - set_value() — успешная печать
+ *   - set_error(std::exception_ptr) — ошибка печати
+ *   - set_stopped() — отмена
+ * @note для конвертации beast::flat_buffer в string используйте beast::buffers_to_string(buffer.data())
+ */
+ #warning "TODO: Реализуйте print_message_sender, который принимает buffer и prefix, конвертирует buffer в string и печатает с префиксом. Не забудьте обработать исключения и stop_token."
+[[nodiscard]]
+inline auto print_message_sender(beast::flat_buffer buffer, std::string_view prefix) -> ex::sender auto ;
+/*
+    Ваш код здесь
+*/
 
 }  // namespace ws
