@@ -59,7 +59,7 @@ FetchContent_MakeAvailable(CPM)
 CPMAddPackage(
     NAME stdexec
     GITHUB_REPOSITORY NVIDIA/stdexec
-    GIT_TAG main
+    GIT_TAG gtc-2026
     OPTIONS
         "STDEXEC_BUILD_EXAMPLES OFF"
         "STDEXEC_BUILD_TESTS OFF"
